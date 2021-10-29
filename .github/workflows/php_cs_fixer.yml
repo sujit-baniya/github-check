@@ -1,0 +1,43 @@
+name: PhpCsFixer
+
+on:
+    workflow_dispatch:
+
+    pull_request:
+        types: [ opened, reopened ]
+        paths: [ "**.php" ]
+        branches: [ master ]
+
+jobs:
+    php_cs_fixer:
+        runs-on: ubuntu-latest
+        steps:
+            -   uses: actions/checkout@v2
+                with:
+                    ref: ${{github.head_ref}}
+                    fetch-depth: 0
+            -   name: Fetch
+                shell: bash -xe {0}
+                run: |
+                    git fetch --depth 1 origin staging
+            -   name: Setup PHP with tools
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: "7.2"
+                    tools: php-cs-fixer
+            -   name: check syntax error
+                shell: bash -xe {0}
+                run: |
+                    if git diff origin/master...origin/staging --name-only --diff-filter=ACMR *.php | \
+                    xargs -n1 -P4 php -l | \
+                    grep -v "No syntax errors detected"; then exit 1; fi
+            -   name: execute php-cs-fixer
+                shell: bash -xe {0}
+                run: |
+                    git diff origin/master...origin/staging --name-only --diff-filter=ACMR *.php | \
+                    grep -v '^manage/views' | \
+                    xargs -n1 -P4 php-cs-fixer fix --using-cache=no
+            -   name: Commit and push
+                uses: stefanzweifel/git-auto-commit-action@v4.2.0
+                with:
+                    commit_message: pxp-cs-fixer by Github Actions
