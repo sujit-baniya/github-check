@@ -7,7 +7,8 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             -   name: PHP Syntax Checker (Lint)
-                uses: StephaneBour/actions-php-lint@7.4
+                uses: overtrue/phplint@8.0
                 with:
-                    dir: './'
+                    path: .
+                    options: --exclude=*.log
 
