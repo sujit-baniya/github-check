@@ -2,15 +2,13 @@ on: pull_request
 
 name: Inspections
 jobs:
-    runPHPCSInspection:
-        name: Run PHPCS inspection
+    checkPHPErrors:
+        name: Check PHP Error
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v2
-              with:
-                  ref: ${{ github.event.pull_request.head.sha }}
-            - name: Check PHP Error
-              uses: overtrue/phplint@8.0
-              with:
-                  path: .
-                  options: --exclude=*.log
+            -   name: PHP Syntax Checker (Lint)
+                uses: overtrue/phplint@8.0
+                with:
+                    path: .
+                    options: --exclude=*.log
+
